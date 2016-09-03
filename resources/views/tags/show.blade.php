@@ -4,13 +4,19 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h1>{{$tag->name}} Tag <small>{{$tag->posts()->count()}} Posts</small></h1>
             <hr>
         </div>
 
-        <div class="col-md-3 col-sm-offset-1">
-            <a href="{{route('tags.edit',$tag->id)}}" class="btn btn-lg btn-primary pull-right">Edit</a>
+        <div class="col-md-2 col-sm-offset-1">
+            <a href="{{route('tags.edit',$tag->id)}}" class="btn btn-block btn-primary pull-right">Edit</a>
+        </div>
+
+        <div class="col-md-2 col-sm-offset-1">
+          {!! Form::open(array('route' => ['tags.destroy',$tag->id],'method'=>'DELETE')) !!}
+              {{Form::submit('Delete',['class'=>  "btn btn-danger btn-block" ])}}
+          {!! Form::close() !!}
         </div>
 
         <hr>
