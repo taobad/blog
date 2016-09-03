@@ -32,11 +32,14 @@
             ->where('slug', '[\w\d\-\_]+');
     Route::get('blog', ['as' => 'blog.index','uses'=> 'BlogController@getIndex']);
     Route::get('/', ['as' => 'home','uses'=>'pagesController@getIndex']);
-    Route::get('/about','pagesController@getAbout');
-    Route::get('/contact','pagesController@getContact');
-    Route::post('/contact','pagesController@postContact');
+    Route::get('/about',['as' => 'about','uses'=>'pagesController@getAbout']);
+    Route::get('/contact',['as' => 'contact.get','uses'=>'pagesController@getContact']);
+    Route::post('/contact',['as' => 'contact.post','uses'=>'pagesController@postContact']);
 
     Route::resource('posts','PostController');
+    Route::resource('comments','CommentsController', ['except'=> ['store']]);
+    Route::post('comments/{post_id}',['as' => 'comments.store','uses'=>'CommentsController@store']);
+    Route::get('comments/{post_id}/delete',['as' => 'comments.delete','uses'=>'CommentsController@delete']);
 
     Route::resource('categories','CategoryController',['except' => ['create']]);
     Route::resource('tags','TagController',['except' => ['create']]);

@@ -16,9 +16,9 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="{{Request::is('/') ? "active":""}}"><a href="/">Home <span class="sr-only">(current)</span></a></li>
-                <li class="{{Request::is('blog') ? "active":""}}"><a href="blog">Blog</a></li>
-                <li class="{{Request::is('about') ? "active":""}}"><a href="about">About</a></li>
-                <li class="{{Request::is('contact') ? "active":""}}"><a href="contact">Contact</a></li>
+                <li class="{{Request::is('blog') ? "active":""}}"><a href="{{route('blog.index')}}">Blog</a></li>
+                <li class="{{Request::is('about') ? "active":""}}"><a href="{{route('about')}}">About</a></li>
+                <li class="{{Request::is('contact') ? "active":""}}"><a href="{{route('contact.get')}}">Contact</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 @if(Auth::check())
