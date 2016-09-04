@@ -7,6 +7,9 @@ use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
 use Session;
+use Purifier;
+use Image;
+use Storage;
 
 use App\Http\Requests;
 
@@ -53,14 +56,25 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'body' => 'required',
             'slug' => 'required|max:255|min:5|alpha_dash|unique:posts,slug',
-            'category_id' => 'required|integer'
+            'category_id' => 'required|integer',
+            'featured_image' => 'sometimes | image'
         ]);
         //$tags = new Tag;
         $post = new Post;
         $post->title = $request->title;
-        $post->body = $request->body;
+        $post->body = Purifier::clean($request->body);
         $post->slug = $request->slug;
         $post->category_id = $request->category_id;
+
+        //save our image
+        if($request->hasFile('featured_image')){
+          $image = $request->file('featured_image');
+          $filename = time() . '.' .$image->getClientOriginalExtension();
+          $location = public_path('images/'.$filename);
+          Image::make($image)->resize(800,400)->save($location);
+
+          $post->image = $filename;
+        }
 
         $post->save();
 
@@ -70,7 +84,7 @@ class PostController extends Controller
             $post->tags()->sync(array());
         }
 
-        Session::flash('success','blog post successfully saved!');
+        Session::flash('success',' Blog post successfully saved!');
         //or
         //session()->flash('success','blog post successfully saved!');
         return redirect()->route('posts.show',$post->id);//->withTags($tags);
@@ -124,27 +138,37 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $post =  Post::find($id);
-        if ($request->input('slug') == $post->slug){
+
             $this->validate($request,[
                 'title' => 'required|max:255',
                 'body' => 'required',
-                'category_id' => 'required|integer'
+                'slug' => "required|max:255|min:5|alpha_dash|unique:posts,slug,$id",
+                'category_id' => 'required|integer',
+                'featured_image' => 'sometimes | image'
             ]);
-        } else {
-            $this->validate($request,[
-                'title' => 'required|max:255',
-                'body' => 'required',
-                'slug' => 'required|max:255|min:5|alpha_dash|unique:posts,slug',
-                'category_id' => 'required|integer'
-            ]);
-        }
 
 
 
         $post->title = $request->title;
-        $post->body = $request->body;
+        $post->body = Purifier::clean($request->body);
         $post->slug = $request->slug;
         $post->category_id = $request->category_id;
+
+        if($request->hasFile('featured_image')){
+          //Add new photo
+          $image = $request->file('featured_image');
+          $filename = time() . '.' .$image->getClientOriginalExtension();
+          $location = public_path('images/'.$filename);
+          Image::make($image)->resize(800,400)->save($location);
+
+          $oldFilename = $post->image;
+          //update the database
+          $post->image = $filename;
+
+          //Delete the old photo
+          Storage::delete($oldFilename);
+
+        }
 
         $post->save();
         if(isset($request->tags)) {
@@ -152,7 +176,7 @@ class PostController extends Controller
         } else{
             $post->tags()->sync(array());
         }
-        Session::flash('success','blog post successfully edited!');
+        Session::flash('success',' Blog post successfully edited!');
         //or
         //session()->flash('success','blog post successfully saved!');
         return redirect()->route('posts.show',$post->id);
@@ -168,7 +192,9 @@ class PostController extends Controller
     {
         $post =  Post::find($id);
         $post->tags()->detach();
-        
+
+        Storage::delete($post->image);
+
         $post->delete();
 
         Session::flash('success',' Post deleted!');

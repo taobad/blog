@@ -2,13 +2,21 @@
 @section('title','| Create New Post')
 @section('stylesheets')
     {!! Html::style('css/select2.min.css') !!}
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script>
+      tinymce.init({
+        selector: 'textarea',
+        plugins: 'link',
+        menubar: false
+      });
+    </script>
 @endsection
 @section('content')
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <h1>Create New Post</h1>
             <hr>
-            {!! Form::open(array('route' => 'posts.store')) !!}
+            {!! Form::open(array('route' => 'posts.store', 'files' => true)) !!}
                 {{Form::label('title','Title:')}}
                 {{Form::text('title',null,['class'=>'form-control'])}}
 
@@ -28,6 +36,9 @@
                         <option value="{{$tag->id}}">{{$tag->name}} </option>
                     @endforeach
                 </select>
+
+                {{Form::label('featured_image','Upload Featured Image:')}}
+                {{Form::file('featured_image')}}
 
                 {{Form::label('body','Post Body:')}}
                 {{Form::textarea('body',null,['class'=>'form-control'])}}

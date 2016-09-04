@@ -14,15 +14,15 @@
                 <div class="post">
                     <h2>{{$post->title}}</h2>
                     <h5>Published: {{date('M,j,Y h:ia',strtotime($post->created_at))}}</h5>
-                    <p>{{substr($post->body,0,300)}}{{strlen($post->body) > 300 ? "...":""}}</p>
+                    <p>{{substr(strip_tags($post->body),0,300)}}{{strlen(strip_tags($post->body)) > 300 ? "...":""}}</p>
                     <a href="{{url('blog/'.$post->slug)}}" class="btn btn-primary"> Read more</a>
                 </div>
                 <hr>
-                <div class="text-center">
-                    {!! $posts->links() !!}
-                </div>
-
             @endforeach
+
+            <div class="text-center">
+                {!! $posts->links() !!}
+            </div>
         </div>
     </div>
 
